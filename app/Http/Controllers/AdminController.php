@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Appointment;
 use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
@@ -66,25 +67,9 @@ class AdminController extends Controller
         ], 200);
     }
 
-    public function appointments()
+    public function destroy($id)
     {
-        if (auth()->user()->role !== 'admin') {
-            return response()->json(['message' => 'Accès refusé'], 403);
-        }
-
-        return response()->json(Appointment::with(['patient', 'doctor'])->get());
-    }
-
-     if ($user->role === 'admin') {
-           return response()->json(['message' => 'Impossible de supprimer un administrateur'], 403);
-     }
-
-       $user->delete();
-       
-         return response()->json([
-             'message' => 'Utilisateur supprimé avec succès'
-         ], 200);
-}
+        $user = User::findOrFail($id);
 
         if ($user->role === 'admin') {
             return response()->json(['message' => 'Impossible de supprimer un administrateur'], 403);
@@ -92,6 +77,22 @@ class AdminController extends Controller
 
         $user->delete();
 
-        return response()->json(['message' => 'Utilisateur supprimé avec succès']);
+        return response()->json([
+            'message' => 'Utilisateur supprimé avec succès'
+        ], 200);
+    }
+
+    public function appointments()
+    {
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['message' => 'Accès refusé'], 403);
+        }
+
+        $appointments = Appointment::with(['patient', 'doctor'])->get();
+
+        return response()->json([
+            'data' => $appointments,
+            'message' => 'Liste des rendez-vous récupérée avec succès'
+        ], 200);
     }
 }
